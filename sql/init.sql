@@ -1,0 +1,19 @@
+CREATE DATABASE IF NOT EXISTS labdb CHARACTER SET utf8mb4;
+CREATE USER IF NOT EXISTS 'labuser'@'%' IDENTIFIED BY 'UserSecure2024!';
+GRANT SELECT, INSERT, UPDATE, DELETE ON labdb.* TO 'labuser'@'%';
+FLUSH PRIVILEGES;
+
+USE labdb;
+CREATE TABLE IF NOT EXISTS services (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL,
+  port INT NOT NULL,
+  secure BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO services (name, port, secure) VALUES
+  ('SSH', 22, true),
+  ('DNS', 53, true),
+  ('DHCP', 67, true),
+  ('FTP', 21, true);
