@@ -1,0 +1,60 @@
+name: DevSecOps Pipeline
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  scan-secrets:
+    name: Scan secrets GitLeaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-scan:
+    name: Build et Scan Trivy
+    runs-on: ubuntu-latest
+    needs: scan-secrets
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build SSH
+        run: docker build -t ssh-lab:ci ./ssh/
+      - name: Build DNS
+        run: docker build -t dns-lab:ci ./dns/
+      - name: Build FTP
+        run: docker build -t ftp-lab:ci ./ftp/
+      - name: Scan SSH
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ssh-lab:ci
+          severity: CRITICAL
+          exit-code: 1
+      - name: Scan DNS
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: dns-lab:ci
+          severity: CRITICAL
+          exit-code: 1
+
+  integration-test:
+    name: Test docker-compose
+    runs-on: ubuntu-latest
+    needs: build-scan
+    steps:
+      - uses: actions/checkout@v4
+      - name: Creer secrets
+        run: |
+          mkdir -p sql/secrets
+          echo "RootTest123!" > sql/secrets/root_password.txt
+          echo "UserTest123!" > sql/secrets/user_password.txt
+          ssh-keygen -t ed25519 -f /tmp/test_key -N ""
+          cp /tmp/test_key.pub ssh/authorized_keys
+      - run: docker compose up -d --build
+      - run: sleep 25
+      - run: docker compose ps
+      - run: docker compose down -v
