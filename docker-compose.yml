@@ -1,0 +1,73 @@
+services:
+  ssh-server:
+    build: ./ssh
+    container_name: lab-ssh
+    ports:
+      - "2222:22"
+    volumes:
+      - ~/.ssh/lab_key.pub:/home/etudiant/.ssh/authorized_keys:ro
+    networks:
+      lab-net:
+        ipv4_address: 172.25.0.5
+    restart: unless-stopped
+
+  dns-server:
+    build: ./dns
+    container_name: lab-dns
+    ports:
+      - "5454:53/udp"
+      - "5454:53/tcp"
+    networks:
+      lab-net:
+        ipv4_address: 172.25.0.10
+    cap_add:
+      - NET_BIND_SERVICE
+      - SETGID
+      - SETUID
+    restart: unless-stopped
+
+  ftp-server:
+    build: ./ftp
+    container_name: lab-ftp
+    ports:
+      - "21:21"
+      - "21100-21110:21100-21110"
+    networks:
+      lab-net:
+        ipv4_address: 172.25.0.20
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: lab-sql
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root
+      MYSQL_DATABASE: labdb
+      MYSQL_USER: labuser
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_user
+    secrets: [mysql_root, mysql_user]
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "127.0.0.1:3306:3306"
+    networks:
+      lab-net:
+        ipv4_address: 172.25.0.30
+    restart: unless-stopped
+
+secrets:
+  mysql_root:
+    file: ./sql/secrets/root_password.txt
+  mysql_user:
+    file: ./sql/secrets/user_password.txt
+
+networks:
+  lab-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/24
+
+volumes:
+  db-data:
