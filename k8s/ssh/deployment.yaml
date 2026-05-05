@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ssh-server
+  namespace: lab-network
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ssh-server
+  template:
+    metadata:
+      labels:
+        app: ssh-server
+    spec:
+      initContainers:
+      - name: fix-perms
+        image: localhost:5000/ssh-lab:v1
+        imagePullPolicy: Always
+        command: ["sh", "-c", "cp /tmp/ssh-keys/authorized_keys /home/etudiant/.ssh/authorized_keys && chmod 700 /home/etudiant/.ssh && chmod 600 /home/etudiant/.ssh/authorized_keys && chown -R etudiant:etudiant /home/etudiant/.ssh"]
+        volumeMounts:
+        - name: ssh-keys-secret
+          mountPath: /tmp/ssh-keys
+        - name: ssh-dir
+          mountPath: /home/etudiant/.ssh
+      containers:
+      - name: ssh
+        image: localhost:5000/ssh-lab:v1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 22
+        volumeMounts:
+        - name: ssh-dir
+          mountPath: /home/etudiant/.ssh
+      volumes:
+      - name: ssh-keys-secret
+        secret:
+          secretName: ssh-keys
+      - name: ssh-dir
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ssh-service
+  namespace: lab-network
+spec:
+  type: NodePort
+  selector:
+    app: ssh-server
+  ports:
+  - port: 22
+    targetPort: 22
+    nodePort: 30022
