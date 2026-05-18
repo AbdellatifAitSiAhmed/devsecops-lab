@@ -1,7 +1,27 @@
-
+# Secrets SQL
 sql/secrets/
 
+# Clés SSH privées
+ssh/keys/
+*.pem
+*.key
+id_ed25519
+id_rsa
+
+# Certs FTP
 ftp/certs/*.key
+ftp/certs/*.pem
 
+# VPN — clés privées WireGuard
+vpn/wg0-server.conf
+vpn/wg0-client*.conf
+*.conf
+
+# Variables d'environnement
 *.env
+.env*
 
+# Fichiers systèmes
+.DS_Store
+__pycache__/
+*.pyc
