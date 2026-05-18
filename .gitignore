@@ -1,27 +1,43 @@
-# Secrets SQL
+# ─── Secrets SQL ───────────────────────────────
 sql/secrets/
+sql/secrets/*.txt
 
-# Clés SSH privées
+# ─── Clés SSH privées ──────────────────────────
 ssh/keys/
-*.pem
-*.key
 id_ed25519
 id_rsa
+*.pem
 
-# Certs FTP
+# ─── Certificats et clés FTP ───────────────────
 ftp/certs/*.key
 ftp/certs/*.pem
+ftp/tls/
 
-# VPN — clés privées WireGuard
+# ─── VPN WireGuard ─────────────────────────────
 vpn/wg0-server.conf
 vpn/wg0-client*.conf
-*.conf
+vpn/*.conf
 
-# Variables d'environnement
+# ─── Variables d'environnement ─────────────────
 *.env
-.env*
+.env
+.env.*
 
-# Fichiers systèmes
+# ─── Kubernetes secrets locaux ─────────────────
+k8s/secrets/
+*.secret.yaml
+
+# ─── Fichiers systèmes ─────────────────────────
 .DS_Store
+Thumbs.db
+*.swp
+*~
+
+# ─── Python ────────────────────────────────────
 __pycache__/
 *.pyc
+*.pyo
+
+# ─── Logs ──────────────────────────────────────
+*.log
+logs/
