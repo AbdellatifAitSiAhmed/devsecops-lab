@@ -3,7 +3,7 @@
 > Infrastructure DevSecOps complète : containerisation, orchestration Kubernetes, pipeline CI/CD sécurisé, VPN WireGuard et monitoring Prometheus/Grafana.
 
 **Module** : Durcissement Système et Sécurité des Données  
-**Filière** : GCDSTE — Génie Cyber-Défense et Systèmes de Télécommunications Embarqués  
+**Filière** : RSSP — Réseaux, Systèmes et Services Programmables
 **Établissement** : ENSA Marrakech | Année universitaire 2025/2026
 
 ---
