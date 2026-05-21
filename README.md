@@ -14,7 +14,7 @@
 |--------|----|--------|
 | Abdellatif AIT SI AHMED | `asa@asa` (Ubuntu 24.04) | `10.8.0.2` |
 | Lahsen AIT OIHMANE | `ubuntu@ubuntu-box` (Ubuntu 24.04) | `10.8.0.3` |
-| VPS DigitalOcean | `root@159.89.22.94` | `10.8.0.1` |
+| VPS DigitalOcean | Serveur Cloud | `10.8.0.1` |
 
 ---
 
@@ -40,8 +40,8 @@
         │                 │                 │
    ┌────▼────┐      ┌─────▼─────┐    ┌──────▼──────┐
    │  SSH    │      │    DNS    │    │     FTP     │
-   │OpenSSH  │      │  BIND9   │    │  ProFTPD+TLS│
-   │Port 2222│      │Port 5454 │    │   Port 21   │
+   │OpenSSH  │      │  BIND9    │    │  ProFTPD+TLS│
+   │Port 2222│      │Port 5454  │    │   Port 21   │
    └─────────┘      └───────────┘    └─────────────┘
         │
    ┌────▼────┐      ┌───────────┐
@@ -74,10 +74,10 @@
 git clone https://github.com/AbdellatifAitSiAhmed/devsecops-lab.git
 cd devsecops-lab
 
-# Créer les secrets
+# Créer les secrets (remplace par tes propres mots de passe)
 mkdir -p sql/secrets
-echo "RootPass2024!" > sql/secrets/root_password.txt
-echo "UserSecure2024!" > sql/secrets/user_password.txt
+echo "${MYSQL_ROOT_PASSWORD}" > sql/secrets/root_password.txt
+echo "${MYSQL_USER_PASSWORD}" > sql/secrets/user_password.txt
 
 # Lancer tous les services
 docker compose up -d
@@ -124,7 +124,7 @@ Job 3 — Integration Tests
 
 ## 🌐 VPN WireGuard
 
-Tunnel chiffré entre les deux VMs via le VPS DigitalOcean (`159.89.22.94:51820`) :
+Tunnel chiffré entre les deux VMs via un VPS DigitalOcean (port 51820) :
 
 ```
 VM Abdellatif (10.8.0.2) ──── WireGuard ────┐
@@ -145,7 +145,7 @@ Stack **kube-prometheus-stack** déployée via Helm dans le namespace `monitorin
 ```bash
 helm install monitoring prometheus-community/kube-prometheus-stack \
   --namespace monitoring --create-namespace \
-  --set grafana.adminPassword=Admin2024!
+  --set grafana.adminPassword=${GRAFANA_ADMIN_PASSWORD}
 ```
 
 - **Prometheus** : collecte métriques en mode pull
@@ -186,6 +186,7 @@ devsecops-lab/
 │   └── wg0-server.conf         # Config WireGuard VPS
 ├── docker-compose.yml
 ├── .gitignore
+├── LICENSE
 └── README.md
 ```
 
@@ -235,6 +236,3 @@ Gestion runtime via **Docker Secrets** et **Kubernetes Secrets** :
 ![WireGuard](https://img.shields.io/badge/WireGuard-VPN-88171A?logo=wireguard&logoColor=white)
 ![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-E6522C?logo=prometheus&logoColor=white)
 ![Grafana](https://img.shields.io/badge/Grafana-Dashboards-F46800?logo=grafana&logoColor=white)
-
-
-
